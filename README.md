@@ -3,4 +3,4 @@ Owlbear Rodeo extension that adds card-game like hand magement of ability/spell 
 * cards can be previewed by clicking on them.
 * cards can be rearranged by drag-and-drop within the hand.
 
-https://kgruger.github.io/hand-handler-obr-extension/docs/hand-handler.js
+https://kgruger.github.io/hand-handler-obr-extension/manifest.json
