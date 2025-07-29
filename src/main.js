@@ -47,6 +47,9 @@ document.addEventListener("click", e => {
     wrapper.classList.add("preview");
     // clone the image into our wrapper
     const clone = clickedCard.cloneNode(true);
+    clone.style.setProperty("--angle", "0deg");
+    clone.style.marginLeft = "0";
+    
     clone.classList.remove("hidden");
     wrapper.appendChild(clone);
 
@@ -70,18 +73,20 @@ document.addEventListener("click", e => {
 function fanCards() {
   const cards = Array.from(document.querySelectorAll("#hand .card"));
   const count = cards.length;
-  if (count === 0) return;
+  if (!count) return;
 
-  // total angle you want to spread across
-  const totalAngle = 30;   // degrees
-  const start = -totalAngle / 2;
-  const step  = totalAngle / (count - 1 || 1);
+  const totalAngle = 30;
+  const start      = -totalAngle / 2;
+  const step       = totalAngle / (count - 1 || 1);
 
   cards.forEach((card, i) => {
     const angle = start + step * i;
-    card.style.transform = `rotate(${angle}deg)`;
-    // z-index: highest at center, so they stack nicely
+    // set CSS variable instead of inline transform
+    card.style.setProperty("--angle", `${angle}deg`);
+
+    // still need z-index inline
     const z = count - Math.abs(i - (count - 1) / 2);
     card.style.zIndex = Math.floor(z);
   });
 }
+

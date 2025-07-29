@@ -37,6 +37,9 @@ html, body {
   transform-origin: bottom center;
   transition: transform 0.2s, margin 0.2s;
   cursor: pointer;
+  --angle: 0deg;               /* fallback */
+  transform: rotate(var(--angle));
+  z-index:0;
 }
 
 .card:first-child {
@@ -44,8 +47,8 @@ html, body {
 }
 
 .card:hover {
-  transform: scale(1.2);
-  z-index: 10;
+  transform: rotate(var(--angle)) scale(1.2) translateY(-10px);
+  z-index: 999;                /* pop above the others */
 }
 
 .card.hidden {
@@ -63,12 +66,14 @@ html, body {
   cursor: zoom-out;
   transition: transform 0.2s;
   display: block;
-
-  /*debug
-  outline: 4px dashed hotpink;
-  background: rgba(255,255,255,0.8);
-  */
 }
+
+/* inside a preview, cards never scale on hover */
+.preview .card:hover {
+  transform: none !important;
+  cursor: zoom-out;    /* keep the “zoom‑out” cursor from the wrapper */
+}
+
 
 /* when a preview is open, disable hover+pointer on all non‑enlarged cards */
 #hand.preview-open .card:not(.enlarged) {
