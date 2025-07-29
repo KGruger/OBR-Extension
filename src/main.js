@@ -84,9 +84,8 @@ function fanCards() {
     // set CSS variable instead of inline transform
     card.style.setProperty("--angle", `${angle}deg`);
 
-    // still need z-index inline
-    const z = count - Math.abs(i - (count - 1) / 2);
-    card.style.zIndex = Math.floor(z);
+    card.style.zIndex = i + 1;
+
   });
 }
 
