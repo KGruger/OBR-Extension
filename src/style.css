@@ -1,3 +1,7 @@
+:root {
+  --obrpurple: #bb99ff;
+}
+
 html, body {
   height: 100%;
   margin: 0;
@@ -27,6 +31,7 @@ body.preview-open .preview {
   align-items: center;
   justify-content: center;
   text-align: center;
+  color: var(--obrpurple);
 }
 
 #hand {
@@ -63,7 +68,7 @@ body.preview-open .preview {
 
 /* highlight card that another card is about to be dropped in after in the hand. */
 .card.drag-over {
-  outline: 5px dashed limegreen;
+  outline: 3px solid var(--obrpurple);
 }
 
 .card.dragging {
@@ -102,7 +107,7 @@ body.preview-open .preview {
 
 /* show line to insert card to the furthest left of the hand */
 #hand.drag-over-left {
-  outline: 4px dashed limegreen;
+  outline: 3px solid var(--obrpurple);
   outline-offset: -8px; /* so the line hugs the cards */
 }
 
