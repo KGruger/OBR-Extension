@@ -1,3 +1,5 @@
+import './style.css'
+
 // Called when session starts
 window.addEventListener('DOMContentLoaded', () => {
   fanCards();
