@@ -4,10 +4,11 @@
   "manifest_version": 1,
   "author": "mr_Gruger",
   "description": "Adds a spell/ability card hand functionality with drag-and-drop, enlarges cards on hover, reordering of cards, and more.",
+  "script": "hand-handler.js",
   "action": {
     "title": "Hand Handler",
-    "icon": "icon.svg",
-    "popover": "hand-handler.html",
+    "icon": "/icon.svg",
+    "popover": "/hand-handler.html",
     "height": 1000,
     "width": 600
   }
