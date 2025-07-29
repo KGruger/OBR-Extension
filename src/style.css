@@ -64,7 +64,7 @@ html, body {
 }
 
 /* when a preview is open, disable hover+pointer on all non‑enlarged cards */
-body.preview-open #hand .card:not(.hidden) {
-  pointer-events: none;
+#hand.preview-open .card:not(.enlarged) {
+  pointer-events: none;         /* no hover, no clicks */
   opacity: 0.2;
 }
