@@ -20,21 +20,27 @@ html, body {
 }
 
 #hand {
-  flex-grow: 1;    
-  position: relative;      
+  position: flex;
+  justify-content: center;
+  flex-grow: 1;
   display: flex;
-  gap: 8px;
-  padding: 8px;
-  overflow-x: auto;
-  overflow-y: visible;
-  align-items: end;
-  background: transparent; 
+  align-items: flex-end;       /* ← stick cards to the bottom */
+  padding: 0 8px 8px;          /* no top padding, only bottom */
+  overflow-x: visible;         
+  background: transparent;
 }
 
 .card {
+  width: 80px;                 /* fixed width for easier math */
   height: 120px;
+  margin-left: -40px;          /* half the width, so they overlap by 50% */
+  transform-origin: bottom center;
+  transition: transform 0.2s, margin 0.2s;
   cursor: pointer;
-  transition: transform 0.2s;
+}
+
+.card:first-child {
+  margin-left: 0;              /* first one doesn’t overlap anything */
 }
 
 .card:hover {

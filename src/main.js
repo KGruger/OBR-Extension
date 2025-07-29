@@ -1,7 +1,10 @@
 import './style.css'
 
+window.addEventListener("DOMContentLoaded", fanCards);
+
 const dropzone = document.getElementById("dropzone");
 const hand = document.getElementById("hand");
+
 
 dropzone.addEventListener("dragover", (e) => {
   e.preventDefault();
@@ -25,6 +28,7 @@ dropzone.addEventListener("drop", async e => {
 
     hand.appendChild(img);
   }
+  fanCards();
 });
 
 document.addEventListener("click", e => {
@@ -61,3 +65,23 @@ document.addEventListener("click", e => {
     document.body.classList.remove("preview-open");
   }
 });
+
+
+function fanCards() {
+  const cards = Array.from(document.querySelectorAll("#hand .card"));
+  const count = cards.length;
+  if (count === 0) return;
+
+  // total angle you want to spread across
+  const totalAngle = 30;   // degrees
+  const start = -totalAngle / 2;
+  const step  = totalAngle / (count - 1 || 1);
+
+  cards.forEach((card, i) => {
+    const angle = start + step * i;
+    card.style.transform = `rotate(${angle}deg)`;
+    // z-index: highest at center, so they stack nicely
+    const z = count - Math.abs(i - (count - 1) / 2);
+    card.style.zIndex = Math.floor(z);
+  });
+}
