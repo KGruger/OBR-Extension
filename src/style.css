@@ -27,7 +27,7 @@ html, body {
   padding: 8px;
   overflow-x: auto;
   overflow-y: visible;
-  align-items: center;
+  align-items: end;
   background: transparent; 
 }
 
@@ -58,9 +58,10 @@ html, body {
   transition: transform 0.2s;
   display: block;
 
-  /*debug*/
+  /*debug
   outline: 4px dashed hotpink;
   background: rgba(255,255,255,0.8);
+  */
 }
 
 /* when a preview is open, disable hover+pointer on all non‑enlarged cards */

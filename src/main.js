@@ -27,24 +27,37 @@ dropzone.addEventListener("drop", async e => {
   }
 });
 
-document.addEventListener("click", (e) => {
-  const isPreviewOpen = !!document.body.querySelector(".preview");
-  const clickedCard   = e.target.closest(".card");
+document.addEventListener("click", e => {
+  const previewOpen = !!document.body.querySelector(".preview");
+  const clickedCard = e.target.closest(".card");
 
-  if (!isPreviewOpen && clickedCard) {
+  if (!previewOpen && clickedCard) {
     // 1) hide the original
     clickedCard.classList.add("hidden");
-    // 2) clone & overlay the preview
-    const preview = clickedCard.cloneNode(true);
-    preview.classList.add("preview");
-    document.body.appendChild(preview);
+
+    // 2) let the rest of the UI know we’re in “preview” mode
+    document.body.classList.add("preview-open");
+
+    // 3) wrap & overlay the preview
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("preview");
+    // clone the image into our wrapper
+    const clone = clickedCard.cloneNode(true);
+    clone.classList.remove("hidden");
+    wrapper.appendChild(clone);
+
+    document.body.appendChild(wrapper);
   }
-  else if (isPreviewOpen) {
-    // 1) remove preview
-    const preview = document.body.querySelector(".preview");
-    if (preview) preview.remove();
+  else if (previewOpen) {
+    // 1) remove the floating preview
+    const wrapper = document.body.querySelector(".preview");
+    wrapper && wrapper.remove();
+
     // 2) un‑hide the original
     const hidden = hand.querySelector(".card.hidden");
-    if (hidden) hidden.classList.remove("hidden");
+    hidden && hidden.classList.remove("hidden");
+
+    // 3) clear preview mode
+    document.body.classList.remove("preview-open");
   }
 });
