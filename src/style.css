@@ -1,0 +1,70 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent; 
+  display: flex;
+  flex-direction: column;
+  font-family: sans-serif;
+  overflow: visible;
+}
+
+#dropzone {
+  height: 50px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#hand {
+  flex-grow: 1;    
+  position: relative;      
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  overflow-x: auto;
+  overflow-y: visible;
+  align-items: center;
+  background: transparent; 
+}
+
+.card {
+  height: 120px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.2);
+  z-index: 10;
+}
+
+.card.hidden {
+  visibility: hidden;
+}
+
+/* .preview is the cloned card that floats on top, centered & scaled. */
+.preview {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(4);
+  transform-origin: center center;
+  z-index: 9999;
+  cursor: zoom-out;
+  transition: transform 0.2s;
+  display: block;
+
+  /*debug*/
+  outline: 4px dashed hotpink;
+  background: rgba(255,255,255,0.8);
+}
+
+/* when a preview is open, disable hover+pointer on all non‑enlarged cards */
+body.preview-open #hand .card:not(.hidden) {
+  pointer-events: none;
+  opacity: 0.2;
+}
