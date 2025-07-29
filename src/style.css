@@ -9,6 +9,16 @@ html, body {
   overflow: visible;
 }
 
+/* don't allow events (hover, drag and drop...) of cards when previewing. */
+body.preview-open #hand {
+  pointer-events: none;
+}
+
+/* but allow the preview to be interacted with and terminated */
+body.preview-open .preview {
+  pointer-events: auto;
+}
+
 #dropzone {
   height: 50px;
   background: transparent;
