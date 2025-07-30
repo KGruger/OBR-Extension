@@ -1,5 +1,5 @@
 {
-  "name": "Hand Handler",
+  "name": "Hand Handler dev",
   "version": "1.0.0",
   "manifest_version": 1,
   "author": "mr_Gruger",
@@ -7,7 +7,7 @@
   "action": {
     "title": "Hand Handler",
     "icon": "/hand-handler-obr-extension/icon.svg",
-    "popover": "/hand-handler-obr-extension/hand-handler.html",
+    "popover": "/hand-handler-obr-extension/",
     "height": 1000,
     "width": 600
   }

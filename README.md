@@ -11,6 +11,7 @@ npm run dev
 http://localhost:5173/manifest.json
 
 ## To build:
+* npm run build
 * add hand-handler.html to the docs folder
 * set the paths correctly in manifest.json and the html; full path from https://kgruger.github.io/ must be there, that is, add /hand-handler-obr-extension/ to all file paths.
 
