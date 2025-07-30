@@ -7,7 +7,7 @@
   "action": {
     "title": "Hand Handler",
     "icon": "/hand-handler-obr-extension/icon.svg",
-    "popover": "/hand-handler-obr-extension/",
+    "popover": "/hand-handler-obr-extension/hand-handler.html",
     "height": 1000,
     "width": 600
   }
