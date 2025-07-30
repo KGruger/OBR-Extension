@@ -2,6 +2,7 @@ import './style.css'
 
 // Called when session starts
 window.addEventListener('DOMContentLoaded', () => {
+  loadHand();
   fanCards();
   enableHandReordering();
 });
@@ -35,6 +36,7 @@ dropzone.addEventListener("drop", async e => {
   }
   fanCards();
   enableHandReordering();
+  saveHand();
 });
 
 // Preview a card when clicked.
@@ -121,6 +123,7 @@ hand.addEventListener('drop', e => {
     hand.insertBefore(draggedCard, hand.firstChild);
     fanCards();
     enableHandReordering();
+    saveHand();
   }
 });
 
@@ -129,8 +132,10 @@ let draggedCard = null;
 function enableHandReordering() {
   const cards = hand.querySelectorAll('.card');
   cards.forEach(card => {
-    card.setAttribute('draggable', true);
+    if (card.dataset.reorderable) return;
+    card.dataset.reorderable = 'true';
 
+    card.setAttribute('draggable', true);
     card.addEventListener('dragstart', onCardDragStart);
     card.addEventListener('dragover', onCardDragOver);
     card.addEventListener('dragleave', onCardDragLeave);
@@ -166,12 +171,11 @@ function onCardDrop(e) {
   target.classList.remove('drag-over');
 
   if (draggedCard && target !== draggedCard) {
-    // insert draggedCard right after target
     const next = target.nextSibling;
     hand.insertBefore(draggedCard, next);
     fanCards();
-    // re‑bind listeners to reflect new order
     enableHandReordering();
+    saveHand();
   }
 }
 
@@ -186,3 +190,25 @@ function onCardDragEnd(e) {
 
 
 
+// save load functions
+// Persist hand order and contents to localStorage
+function saveHand() {
+  const urls = Array.from(hand.querySelectorAll('.card')).map(img => img.src);
+  localStorage.setItem('cardHand', JSON.stringify(urls));
+}
+
+function loadHand() {
+  const data = localStorage.getItem('cardHand');
+  if (!data) return;
+  try {
+    const urls = JSON.parse(data);
+    urls.forEach(url => {
+      const img = document.createElement('img');
+      img.src = url;
+      img.classList.add('card');
+      hand.appendChild(img);
+    });
+  } catch (e) {
+    console.error('Failed to load hand from localStorage', e);
+  }
+}

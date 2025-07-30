@@ -35,7 +35,7 @@ body.preview-open .preview {
 }
 
 #hand {
-  position: flex;
+  display: flex;
   justify-content: center;
   flex-grow: 1;
   display: flex;

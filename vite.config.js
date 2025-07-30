@@ -20,5 +20,5 @@ export default defineConfig({
     emptyOutDir: true,
   },
 
-  base: '/hand-handler-obr-extension/',
+  base: '/',
 });
