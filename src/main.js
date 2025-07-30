@@ -3,7 +3,6 @@ import './style.css'
 // Called when session starts
 window.addEventListener('DOMContentLoaded', () => {
   loadHand();
-  addPlaceholder();
   fanCards();
   enableHandReordering();
 });
@@ -11,40 +10,192 @@ window.addEventListener('DOMContentLoaded', () => {
 const dropzone = document.getElementById("dropzone");
 const hand = document.getElementById("hand");
 
-// Create an invisible placeholder for first-card insertion
-function addPlaceholder() {
-  let placeholder = hand.querySelector('.placeholder');
-  if (!placeholder) {
-    placeholder = document.createElement('div');
-    placeholder.classList.add('card', 'placeholder');
-    hand.insertBefore(placeholder, hand.firstChild);
 
-    placeholder.addEventListener('dragover', e => {
-      e.preventDefault();
-      placeholder.classList.add('drag-over');
-      e.dataTransfer.dropEffect = 'move';
-    });
+dropzone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropzone.style.background = "#ccf";
+});
 
-    placeholder.addEventListener('dragleave', () => {
-      placeholder.classList.remove('drag-over');
-    });
+dropzone.addEventListener("dragleave", () => {
+  dropzone.style.background = "transparent";
+});
 
-    placeholder.addEventListener('drop', e => {
-      e.preventDefault();
-      placeholder.classList.remove('drag-over');
-      if (draggedCard) {
-        hand.insertBefore(draggedCard, placeholder.nextSibling);
-        afterReorder();
-      }
-    });
+// event when a card is dropped onto the drop zone.
+dropzone.addEventListener("drop", async e => {
+  e.preventDefault();
+  dropzone.style.background = "transparent";
+
+    // If dragging an existing card, delete it
+  if (draggedCard) {
+    hand.removeChild(draggedCard);
+    draggedCard = null;
+  }
+  else if (e.dataTransfer.files && e.dataTransfer.files.length) {
+    for (const file of e.dataTransfer.files) {
+      if (!file.type.startsWith("image/")) continue;
+      const url = URL.createObjectURL(file);
+      const img = document.createElement("img");
+      img.src   = url;
+      img.classList.add("card");
+
+      hand.appendChild(img);
+    }
+  }
+
+  afterReorder();
+});
+
+// Preview a card when clicked.
+document.addEventListener("click", e => {
+  const previewOpen = !!document.body.querySelector(".preview");
+  const clickedCard = e.target.closest(".card");
+
+  if (!previewOpen && clickedCard) {
+    // 1) hide the original
+    clickedCard.classList.add("hidden");
+
+    // 2) let the rest of the UI know we’re in “preview” mode
+    document.body.classList.add("preview-open");
+
+    // 3) wrap & overlay the preview
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("preview");
+    // clone the image into our wrapper
+    const clone = clickedCard.cloneNode(true);
+    clone.style.setProperty("--angle", "0deg");
+    clone.style.marginLeft = "0";
+    
+    clone.classList.remove("hidden");
+    wrapper.appendChild(clone);
+
+    document.body.appendChild(wrapper);
+  }
+  else if (previewOpen) {
+    // 1) remove the floating preview
+    const wrapper = document.body.querySelector(".preview");
+    wrapper && wrapper.remove();
+
+    // 2) un‑hide the original
+    const hidden = hand.querySelector(".card.hidden");
+    hidden && hidden.classList.remove("hidden");
+
+    // 3) clear preview mode
+    document.body.classList.remove("preview-open");
+  }
+});
+
+
+// fan cards like a naturally held hand of cards.
+function fanCards() {
+  const cards = Array.from(document.querySelectorAll("#hand .card"));
+  const count = cards.length;
+  if (!count) return;
+
+  const totalAngle = 30;
+  const start = count > 1 ? -totalAngle / 2 : 0;
+  const step  = count > 1 ? totalAngle / (count - 1) : 0;
+
+  cards.forEach((card, i) => {
+    const angle = start + step * i;
+    // set CSS variable instead of inline transform
+    card.style.setProperty("--angle", `${angle}deg`);
+
+    card.style.zIndex = i + 1;
+
+  });
+}
+
+// Functions and event listeners to handle drag-and-drop cards within hand to rearrange them.
+hand.addEventListener('dragover', e => {
+  e.preventDefault();
+  // only light up if we’re over the container (not over a card)
+  if (e.target === hand && draggedCard) {
+    hand.classList.add('drag-over-left');
+    e.dataTransfer.dropEffect = 'move';
+  }
+});
+
+hand.addEventListener('dragleave', e => {
+  if (e.target === hand) {
+    hand.classList.remove('drag-over-left');
+  }
+});
+
+hand.addEventListener('drop', e => {
+  e.preventDefault();
+  hand.classList.remove('drag-over-left');
+  if (e.target === hand && draggedCard) {
+    // drop before the very first card
+    hand.insertBefore(draggedCard, hand.firstChild);
+    afterReorder();
+  }
+});
+
+let draggedCard = null;
+
+function enableHandReordering() {
+  const cards = hand.querySelectorAll('.card');
+  cards.forEach(card => {
+    if (card.dataset.reorderable) return;
+    card.dataset.reorderable = 'true';
+
+    card.setAttribute('draggable', true);
+    card.addEventListener('dragstart', onCardDragStart);
+    card.addEventListener('dragover', onCardDragOver);
+    card.addEventListener('dragleave', onCardDragLeave);
+    card.addEventListener('drop', onCardDrop);
+    card.addEventListener('dragend', onCardDragEnd);
+  });
+}
+
+function onCardDragStart(e) {
+  draggedCard = e.currentTarget;
+  draggedCard.classList.add('dragging');
+  // required for dragover to fire in Firefox
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', '');
+}
+
+function onCardDragOver(e) {
+  e.preventDefault(); // allow drop
+  const target = e.currentTarget;
+  if (target !== draggedCard) {
+    target.classList.add('drag-over');
+    e.dataTransfer.dropEffect = 'move';
   }
 }
 
+function onCardDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function onCardDrop(e) {
+  e.preventDefault();
+  const target = e.currentTarget;
+  target.classList.remove('drag-over');
+
+  if (draggedCard && target !== draggedCard) {
+    const next = target.nextSibling;
+    hand.insertBefore(draggedCard, next);
+    afterReorder();
+  }
+}
+
+function onCardDragEnd(e) {
+  if (draggedCard) {
+    draggedCard.classList.remove('dragging');
+    draggedCard = null;
+  }
+  // clean up any leftover highlight
+  hand.querySelectorAll('.drag-over').forEach(c => c.classList.remove('drag-over'));
+}
+
+
+
+// save load functions
 // Persist hand order and contents to localStorage
 function saveHand() {
-  const urls = Array.from(hand.querySelectorAll('.card'))
-    .filter(el => !el.classList.contains('placeholder'))
-    .map(img => img.src);
+  const urls = Array.from(hand.querySelectorAll('.card')).map(img => img.src);
   localStorage.setItem('cardHand', JSON.stringify(urls));
 }
 
@@ -62,134 +213,6 @@ function loadHand() {
   } catch (e) {
     console.error('Failed to load hand from localStorage', e);
   }
-}
-
-// Dropzone handlers
-let draggedCard = null;
-
-dropzone.addEventListener("dragover", e => {
-  e.preventDefault();
-  dropzone.style.background = "#ccf";
-});
-
-dropzone.addEventListener("dragleave", () => {
-  dropzone.style.background = "transparent";
-});
-
-// event when a card or file is dropped onto the drop zone.
-dropzone.addEventListener("drop", async e => {
-  e.preventDefault();
-  dropzone.style.background = "transparent";
-
-  // If dragging an existing card, delete it
-  if (draggedCard) {
-    hand.removeChild(draggedCard);
-    draggedCard = null;
-  }
-  // Else if user dropped new files, add cards
-  else if (e.dataTransfer.files && e.dataTransfer.files.length) {
-    for (const file of e.dataTransfer.files) {
-      if (!file.type.startsWith("image/")) continue;
-      const url = URL.createObjectURL(file);
-      const img = document.createElement("img");
-      img.src   = url;
-      img.classList.add("card");
-      hand.appendChild(img);
-    }
-  }
-
-  addPlaceholder();
-  afterReorder();
-});
-
-// Simple card preview on click
-// (unchanged)
-document.addEventListener("click", e => {
-  const previewOpen = !!document.body.querySelector(".preview");
-  const clickedCard = e.target.closest(".card:not(.placeholder)");
-
-  if (!previewOpen && clickedCard) {
-    clickedCard.classList.add("hidden");
-    document.body.classList.add("preview-open");
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("preview");
-    const clone = clickedCard.cloneNode(true);
-    clone.style.setProperty("--angle", "0deg");
-    clone.style.marginLeft = "0";
-    clone.classList.remove("hidden");
-    wrapper.appendChild(clone);
-    document.body.appendChild(wrapper);
-  } else if (previewOpen) {
-    const wrapper = document.body.querySelector(".preview");
-    wrapper && wrapper.remove();
-    const hidden = hand.querySelector(".card.hidden");
-    hidden && hidden.classList.remove("hidden");
-    document.body.classList.remove("preview-open");
-  }
-});
-
-// Fan cards like a naturally held hand of cards.
-function fanCards() {
-  const cards = Array.from(document.querySelectorAll("#hand .card:not(.placeholder)"));
-  const count = cards.length;
-  if (!count) return;
-
-  const totalAngle = 30;
-  const start      = -totalAngle / 2;
-  const step       = totalAngle / (count - 1 || 1);
-
-  cards.forEach((card, i) => {
-    const angle = start + step * i;
-    card.style.setProperty("--angle", `${angle}deg`);
-    card.style.zIndex = i + 1;
-  });
-}
-
-// Reordering logic
-function enableHandReordering() {
-  addPlaceholder();
-  const cards = hand.querySelectorAll('.card:not(.placeholder)');
-  cards.forEach(card => {
-    if (card.dataset.reorderable) return;
-    card.dataset.reorderable = 'true';
-    card.setAttribute('draggable', true);
-    card.addEventListener('dragstart', onCardDragStart);
-    card.addEventListener('dragover', onCardDragOver);
-    card.addEventListener('dragleave', onCardDragLeave);
-    card.addEventListener('drop', onCardDrop);
-    card.addEventListener('dragend', onCardDragEnd);
-  });
-}
-function onCardDragStart(e) {
-  draggedCard = e.currentTarget;
-  draggedCard.classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', '');
-}
-function onCardDragOver(e) {
-  e.preventDefault();
-  const target = e.currentTarget;
-  if (target !== draggedCard) {
-    target.classList.add('drag-over');
-    e.dataTransfer.dropEffect = 'move';
-  }
-}
-function onCardDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
-function onCardDrop(e) {
-  e.preventDefault();
-  const target = e.currentTarget;
-  target.classList.remove('drag-over');
-  if (draggedCard && target !== draggedCard) {
-    hand.insertBefore(draggedCard, target.nextSibling);
-    afterReorder();
-  }
-}
-function onCardDragEnd() {
-  if (draggedCard) {
-    draggedCard.classList.remove('dragging');
-    draggedCard = null;
-  }
-  hand.querySelectorAll('.drag-over').forEach(c => c.classList.remove('drag-over'));
 }
 
 // After any add, remove, or reorder
